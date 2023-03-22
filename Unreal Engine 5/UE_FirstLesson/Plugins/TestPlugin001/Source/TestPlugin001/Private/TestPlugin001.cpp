@@ -1,5 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+// First part
+/*
 #include "TestPlugin001.h"
 
 #define LOCTEXT_NAMESPACE "FTestPlugin001Module"
@@ -192,6 +194,64 @@ void FTestPlugin001Module::ShutdownModule()
 FString FTestPlugin001Module::GetHelloWorld()
 {
 	return TEXT("Hello!!!!");
+}
+
+#undef LOCTEXT_NAMESPACE
+
+IMPLEMENT_MODULE(FTestPlugin001Module, TestPlugin001)
+*/
+
+#include "TestPlugin001.h"
+#include "UselessObject.h"
+
+#define LOCTEXT_NAMESPACE "FTestPlugin001Module"
+
+
+void FTestPlugin001Module::StartupModule()
+{
+	UUselessObject* UselessObject = NewObject<UUselessObject>();
+	UE_LOG(LogTemp, Warning, TEXT("Useless: %s %s %s"), *UselessObject->GetName(), *UselessObject->GetPathName(), *UselessObject->GetFullName());
+
+	UselessObject = NewObject<UUselessObject>();
+	UE_LOG(LogTemp, Warning, TEXT("Useless: %s %s %s"), *UselessObject->GetName(), *UselessObject->GetPathName(), *UselessObject->GetFullName());
+
+	UselessObject = NewObject<UUselessObject>();
+	UE_LOG(LogTemp, Warning, TEXT("Useless: %s %s %s"), *UselessObject->GetName(), *UselessObject->GetPathName(), *UselessObject->GetFullName());
+
+	UselessObject = NewObject<UUselessObject>();
+	UE_LOG(LogTemp, Warning, TEXT("Useless: %s %s %s"), *UselessObject->GetName(), *UselessObject->GetPathName(), *UselessObject->GetFullName());
+
+	UselessObject->DummyNumber = 100;
+
+	UClass* UselessClass = UUselessObject::StaticClass();
+
+	FProperty* DummyNumberProperty = UselessClass->FindPropertyByName(TEXT("DummyNumber"));
+
+	UE_LOG(LogTemp, Error, TEXT("DummyNumberProperty at %p"), DummyNumberProperty);
+
+	/*FIntProperty* IntProperty = new FIntProperty(UselessClass, TEXT("DummyNumber"),
+		RF_MarkAsNative | RF_Public | RF_Standalone | RF_Transient,
+		STRUCT_OFFSET(UUselessObject, DummyNumber),
+		CPF_Edit | CPF_BlueprintVisible);
+
+	UselessClass->StaticLink(false);*/
+
+	DummyNumberProperty = UselessClass->FindPropertyByName(TEXT("DummyNumber"));
+
+	UE_LOG(LogTemp, Error, TEXT("DummyNumberProperty at %p"), DummyNumberProperty);
+
+	UselessObject->AddToRoot();
+	UselessObject->RemoveFromRoot();
+}
+
+void FTestPlugin001Module::ShutdownModule()
+{
+
+}
+
+FString FTestPlugin001Module::GetHelloWorld()
+{
+	return TEXT("Hello!!!");
 }
 
 #undef LOCTEXT_NAMESPACE
