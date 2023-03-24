@@ -38,6 +38,8 @@ public class TestPlugin001 : ModuleRules
                 "Engine",
                 "Slate",
                 "SlateCore",
+                "AssetRegistry",
+                "UnrealEd"
 				// ... add private dependencies that you statically link with here ...	
 			}
             );

@@ -203,12 +203,15 @@ IMPLEMENT_MODULE(FTestPlugin001Module, TestPlugin001)
 
 #include "TestPlugin001.h"
 #include "UselessObject.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "Editor.h"
 
 #define LOCTEXT_NAMESPACE "FTestPlugin001Module"
 
 
 void FTestPlugin001Module::StartupModule()
 {
+	/*
 	UUselessObject* UselessObject = NewObject<UUselessObject>();
 	UE_LOG(LogTemp, Warning, TEXT("Useless: %s %s %s"), *UselessObject->GetName(), *UselessObject->GetPathName(), *UselessObject->GetFullName());
 
@@ -229,12 +232,12 @@ void FTestPlugin001Module::StartupModule()
 
 	UE_LOG(LogTemp, Error, TEXT("DummyNumberProperty at %p"), DummyNumberProperty);
 
-	/*FIntProperty* IntProperty = new FIntProperty(UselessClass, TEXT("DummyNumber"),
-		RF_MarkAsNative | RF_Public | RF_Standalone | RF_Transient,
-		STRUCT_OFFSET(UUselessObject, DummyNumber),
-		CPF_Edit | CPF_BlueprintVisible);
-
-	UselessClass->StaticLink(false);*/
+	//FIntProperty* IntProperty = new FIntProperty(UselessClass, TEXT("DummyNumber"),
+	//	RF_MarkAsNative | RF_Public | RF_Standalone | RF_Transient,
+	//	STRUCT_OFFSET(UUselessObject, DummyNumber),
+	//	CPF_Edit | CPF_BlueprintVisible);
+	//
+	//UselessClass->StaticLink(false);
 
 	DummyNumberProperty = UselessClass->FindPropertyByName(TEXT("DummyNumber"));
 
@@ -242,6 +245,89 @@ void FTestPlugin001Module::StartupModule()
 
 	UselessObject->AddToRoot();
 	UselessObject->RemoveFromRoot();
+	*/
+}
+
+bool FTestPlugin001Module::Exec(UWorld* World, const TCHAR* Cmd, FOutputDevice& Ar)
+{
+	if (FParse::Command(&Cmd, TEXT("aivprops")))
+	{
+		TArray<FAssetData> AssetsData;
+		GEditor->GetContentBrowserSelections(AssetsData);
+		for (const FAssetData& AssetData : AssetsData)
+		{
+			UObject* Instance = AssetData.GetAsset();
+			UClass* AssetClass = Instance->GetClass();
+
+			if (AssetClass->IsChildOf(UBlueprint::StaticClass()))
+			{
+				AssetClass = Cast<UBlueprint>(Instance)->GeneratedClass;
+			}
+
+			for (TFieldIterator<FProperty> It(AssetClass); It; ++It)
+			{
+				FProperty* Property = *It;
+
+				if (FStrProperty* StrProperty = CastField<FStrProperty>(Property))
+				{
+					//const FString& String = StrProperty->GetPropertyValue_InContainer(Instance);
+					//StrProperty->GetPropertyValue_InContainer(Instance);
+					//UE_LOG(LogTemp, Warning, TEXT("Asset %s Prop %s Value %s"), *Instance->GetFullName(), *Property->GetName(), *String);
+					UE_LOG(LogTemp, Warning, TEXT("Asset %s Prop %s"), *Instance->GetFullName(), *Property->GetName());
+				}
+			}
+		}
+	}
+
+	if (FParse::Command(&Cmd, TEXT("aivworlds")))
+	{
+		for (TObjectIterator<UWorld> It; It; ++It)
+		{
+			UWorld* World = *It;
+			UE_LOG(LogTemp, Warning, TEXT("Found World %s"), *World->GetFullName());
+			if (World->WorldType == EWorldType::Editor)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Hello I am the editor!"));
+				AActor* Dummy = World->SpawnActor<AActor>(FVector(0, 0, 100), FRotator());
+				//Dummy->Destroy();
+				World->SpawnActor<AActor>(FVector(0, 0, 200), FRotator());
+				World->SpawnActor<AActor>(FVector(0, 0, 300), FRotator());
+			}
+		}
+	}
+
+	if (FParse::Command(&Cmd, TEXT("aivassets")))
+	{
+		FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+		TArray<FAssetData> AssetsData;
+		AssetRegistryModule.Get().GetAllAssets(AssetsData);
+
+		for (const FAssetData& AssetData : AssetsData)
+		{
+			Ar.Logf(TEXT("Assets %s: %s"), *AssetData.GetFullName(), AssetData.IsAssetLoaded());
+			//UUselessObject* Object = Cast<UUselessObject>(AssetData.GetAsset());
+		}
+
+		AssetsData.Empty();
+		AssetRegistryModule.Get().GetAssetsByClass(*(UMaterial::StaticClass()->GetPathName()), AssetsData);
+		for (const FAssetData& AssetData : AssetsData)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Assets %s: %s"), *AssetData.GetFullName(), AssetData.IsAssetLoaded());
+		}
+
+		/*
+		FARFilter Filter;
+		Filter.bRecursivePaths = true;
+		Filter.SoftObjectPaths.Add(FSoftObjectPath("/Game"));
+		AssetsData.Empty();
+		AssetRegistryModule.Get().GetAssets(Filter, AssetsData);
+		for (const FAssetData& AssetData : AssetsData)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Assets %s: %s"), *AssetData.GetFullName(), AssetData.IsAssetLoaded());
+		}
+		*/
+	}
+	return false;
 }
 
 void FTestPlugin001Module::ShutdownModule()

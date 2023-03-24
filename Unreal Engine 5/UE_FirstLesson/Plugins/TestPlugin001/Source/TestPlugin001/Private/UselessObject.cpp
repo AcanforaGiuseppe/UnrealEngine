@@ -17,6 +17,11 @@ int32 UUselessObject::GetNumber(const FString& Value)
 	return Value.Len();
 }
 
+void UUselessObject::LazyLoad()
+{
+	Other.LoadSynchronous();
+}
+
 void UUselessObject::Serialize(FArchive& Ar)
 {
 	Super::Serialize(Ar);

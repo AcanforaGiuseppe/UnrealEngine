@@ -21,8 +21,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		int32 GetNumber(const FString& Value);
 
-	//UPROPERTY()
-	UUselessObject* Other;
+	UPROPERTY()
+		TSoftObjectPtr<UUselessObject> Other;
 
 	void Serialize(FArchive& Ar) override;
+	void LazyLoad();
 };
