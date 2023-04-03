@@ -52,6 +52,6 @@ public class TestPlugin001 : ModuleRules
 			}
             );
 
-        PublicAdditionalLibraries.Add("D:/Development/- Projects/Unreal Engine/Unreal Engine 5/UE_FirstLesson/UnrealDll/libaiv.lib");
+        //PublicAdditionalLibraries.Add("D:/Development/- Projects/Unreal Engine/Unreal Engine 5/UE_FirstLesson/UnrealDll/libaiv.lib");
     }
 }
