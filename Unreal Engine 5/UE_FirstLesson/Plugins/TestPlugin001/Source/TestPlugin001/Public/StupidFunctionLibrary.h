@@ -14,4 +14,6 @@ class TESTPLUGIN001_API UStupidFunctionLibrary : public UBlueprintFunctionLibrar
 public:
 	UFUNCTION(BlueprintCallable, Category = "AIV")
 		static float GetGlobalSmartValue();
+	UFUNCTION(BlueprintCallable, Category = "AIV")
+		static int64 GetFactorial(const int64 Factor);
 };

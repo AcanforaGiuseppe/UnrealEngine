@@ -363,6 +363,59 @@
 
 static const FName DummyNomadTab = TEXT("DummyTab");
 
+#pragma region Multithreading Tasks
+struct FAIVTask
+{
+	FString Name;
+	TArray<TSharedRef<FAIVTask>> Dependencies;
+	bool bRunning;
+	bool bCompleted;
+
+	bool CanRun()
+	{
+		for (const TSharedRef<FAIVTask> Task : Dependencies)
+		{
+			if (!Task->bCompleted)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	void Run()
+	{
+
+	}
+};
+
+class FAIVTaskGraph
+{
+	TArray<TSharedRef<FAIVTask>> Tasks;
+
+	void EnqueueTask(const TSharedRef<FAIVTask> Task)
+	{
+		Tasks.Add(Task);
+	}
+
+	void Run()
+	{
+		for (;;)
+		{
+			for (const TSharedRef<FAIVTask>& Task : Tasks)
+			{
+				if (Task->CanRun())
+				{
+					Task->bRunning = true;
+					Task->Run();
+					Task->bCompleted = true;
+				}
+			}
+		}
+	}
+};
+#pragma endregion
+
 void FTestPlugin001Module::StartupModule()
 {
 	TSharedRef<FExtender> Extender = MakeShared<FExtender>();
