@@ -9,5 +9,6 @@ class ABombermanOnlineGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 public:
+	// Initialize the bomberman game mode
 	ABombermanOnlineGameMode();
 };
